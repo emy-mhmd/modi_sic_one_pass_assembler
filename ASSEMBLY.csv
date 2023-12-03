@@ -7,7 +7,7 @@ LENGTH  ;RESW   ;1
 BUFFER  ;RESB  ;4096
 FIRST   ;STL    ;RETADR
 CLOOP   ;JSUB   ;RDREC
-        ;LDA    ;LENGTH
+        ;LDA   ;LENGTH
         ;COMP   ;ZERO
         ;JEQ    ;ENDFILL
         ;JSUB   ;WRREC
@@ -41,5 +41,5 @@ WLOOP   ;TD     ;OUTPUT
         ;WD     ;OUTPUT 
         ;TIX    ;LENGTH
         ;JLT    ;WLOOP
-        ;RSUB       
+        ;RSUB
         ;END    ;FIRST                                             
