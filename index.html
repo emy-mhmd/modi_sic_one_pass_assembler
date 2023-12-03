@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Variable Display</title>
+</head>
+<body>
+    
+    <div class="desgin">
+        <h2 id="my-variable"></h2>
+    </div>
+
+    <div class="desgin2">
+        <table id="my-symbolTable"></table>
+    </div>
+
+    
+    <script>
+        // Use JavaScript to fetch the variables from the server
+        fetch('/get_variable')
+            .then(response => response.json())
+            .then(data => {
+                // Convert my_variable to a string if it's not a string already
+                const myVariableString = String(data.my_variable);
+
+                const values = myVariableString.split(',');
+
+                const formattedValues = values.join('<br>');
+    
+                
+                // Convert my_symbolTable to a string if it's not a string already
+                
+                const formattedSymbolTable = typeof data.my_symbolTable === 'string'
+                    ? data.my_symbolTable
+                    : JSON.stringify(data.my_symbolTable);
+                
+                // Set the inner HTML of the first element
+                document.getElementById('my-variable').innerHTML = formattedValues;
+
+                // console.log(data.my_symbolTable)
+                const jsonData = data.my_symbolTable
+                // // Parse JSON data
+                // const data = JSON.parse(jsonData);
+                console.log(jsonData)
+                // // Create a table dynamically
+                const table = document.getElementById('my-symbolTable');
+
+                // Create header row
+                const headerRow = table.insertRow(0);
+                const headerCell1 = headerRow.insertCell(0);
+                const headerCell2 = headerRow.insertCell(1);
+                headerCell1.textContent = 'Reference';
+                headerCell2.textContent = 'Address';
+
+                // Create data rows 
+                for (const key in jsonData) {
+                    if (jsonData.hasOwnProperty(key)) {
+                        const row = table.insertRow(-1);
+                        const cell1 = row.insertCell(0);
+                        const cell2 = row.insertCell(1);
+                        cell1.textContent = key;
+                        cell2.textContent = jsonData[key];
+                    }
+                }
+                console.log('Table created successfully!', jsonData);
+
+                // Set the inner HTML of the second element
+                // document.getElementById('my-symbolTable').innerText = formattedSymbolTable;
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>

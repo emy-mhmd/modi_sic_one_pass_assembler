@@ -1,0 +1,31 @@
+body{
+    background-color: #d2d7d7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.desgin{
+    width: 1000px;
+    margin: auto;
+    background-color: #6d8691;
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+}
+.desgin h2{
+    color: white;   
+}
+.desgin2{
+    margin: auto;
+}
+table {
+    border-collapse: collapse;
+    width: 250px;
+}
+table, th, td {
+    border: 1px solid black;
+    padding: 5px;
+}

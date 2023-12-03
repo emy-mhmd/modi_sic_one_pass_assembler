@@ -5,7 +5,7 @@ class File:
     def __init__(self):
        self.df=0 
     def read_file(self):
-        self.df = pd.read_csv('modi_sic_one_pass_assembler\ASSEMBLY.csv', delimiter=';',header=None)
+        self.df = pd.read_csv('ASSEMBLY.csv', delimiter=';',header=None)
         self.df = self.df.apply(lambda x: x.str.replace(';', ''))
 
 
@@ -156,7 +156,6 @@ class Onepass:
                     if isinstance(row[2], str):
                         
                         if row[0].strip() in self.symboltable_ForwardReferencing.keys():
-                            #print("jjjjjjjjjjjj" , self.pointerLC)
                             locationCounter_ForwarReferencing = self.symboltable[row[0].strip()]
                             Reference_ForwarReferencing = row[0].strip()
                             tRecord_started = 0
@@ -185,7 +184,6 @@ class Onepass:
                     if isinstance(row[2], str):
 
                         if row[0].strip() in self.symboltable_ForwardReferencing.keys():
-                            #print("jjjjjjjjjjjj" , self.pointerLC)
                             locationCounter_ForwarReferencing =  self.symboltable[row[0].strip()]
                             Reference_ForwarReferencing = row[0].strip()
                             tRecord_started = 0
@@ -209,7 +207,6 @@ class Onepass:
                     if isinstance(row[2], str):
 
                         if row[0].strip() in self.symboltable_ForwardReferencing.keys():
-                            #print("jjjjjjjjjjjj" , self.pointerLC)
                             locationCounter_ForwarReferencing =  self.symboltable[row[0].strip()]
                             Reference_ForwarReferencing = row[0].strip()
                             tRecord_started = 0
@@ -272,28 +269,11 @@ class Onepass:
                         self.hteRecord.append(list[i])   
         
 
-        #print (self.objectcode)    
-        #print(self.locationcounter)
-        # print(self.symboltable_ForwardReferencing)
-        # print(self.symboltable)
-        #print(self.hteRecord)
-                     
-    def hte(self,f):
-        name=str(f.df.iloc[0,0]).strip().upper()
-        name=name.ljust(6,'X')
-        start=str(f.df.iloc[0,2]).zfill(6).strip()
-        hex1=self.locationcounter[-1]
-        hex2=self.locationcounter[0]
-        int1=int(hex1,16)
-        int2=int(hex2,16)
-        prog_len=int1-int2
-        prog_len=hex(prog_len)[2:]
-        prog_len=prog_len.zfill(6).upper()
-        self.hline=('H'+name+start+prog_len).strip()
-        self.hteRecord.insert(0,self.hline)
-        self.endline='E'+start
-        self.hteRecord.append(self.endline)
-        print(self.hteRecord)
+        self.hte(f)
+        return self.hteRecord                     
+    
+
+
 
     def check_byte(self,row):
        
@@ -369,3 +349,20 @@ class Onepass:
             tline = "T00"+list_values[i].upper()+"02"+lc
             list_hte.append(tline)
         return list_hte
+    
+    def hte(self,f):
+        name=str(f.df.iloc[0,0]).strip().upper()
+        name=name.ljust(6,'X')
+        start=str(f.df.iloc[0,2]).zfill(6).strip()
+        hex1=self.locationcounter[-1]
+        hex2=self.locationcounter[0]
+        int1=int(hex1,16)
+        int2=int(hex2,16)
+        prog_len=int1-int2
+        prog_len=hex(prog_len)[2:]
+        prog_len=prog_len.zfill(6).upper()
+        self.hline=('H'+name+start+prog_len).strip()
+        self.hteRecord.insert(0,self.hline)
+        self.endline='E'+start
+        self.hteRecord.append(self.endline)
+        print(self.hteRecord)
