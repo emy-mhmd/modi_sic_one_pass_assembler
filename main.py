@@ -4,8 +4,7 @@ import onepass as p
 def mainfun(f):
         f.read_file()
         one.read_line(f)
-        #print(one.objectcode)
-        
+        one.hte(f)
 
 if __name__ == '__main__':
    
