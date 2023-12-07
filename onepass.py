@@ -327,13 +327,15 @@ class Onepass:
         # print(self.symboltable)
         # print(self.locationCounter_ForwarReferencing)
         #print(self.hteRecord)
-        #print(self.assembly_lines)
     
         self.hte(f)
         self.assembly()
         self.create_symbol_table()
         self.create_assembly_table()
         self.create_hte()
+
+        print(self.hteRecord)
+
 
         return self.hteRecord
 
