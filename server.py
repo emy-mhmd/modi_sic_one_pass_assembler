@@ -31,5 +31,6 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     PORT = 8000
     with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
-        print(f"Serving on port {PORT}")
+        print(f"click here ---> http://127.0.0.1:8000/" )
         httpd.serve_forever()
+#Serving on port {PORT} 

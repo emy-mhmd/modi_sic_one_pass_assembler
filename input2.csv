@@ -1,0 +1,28 @@
+COPY    ;START  ;1000
+EOF     ;BYTE   ;C'EOF'
+THREE   ;WORD   ;3
+ZERO    ;WORD   ;0
+RETADR  ;RESW   ;1
+LENGTH  ;RESW   ;1
+BUFFER  ;RESB   ;4096
+FIRST   ;STL    ;RETADR
+CLOOP   ;JSUB   ;RDREC
+        ;LDA    ;LENGTH
+        ;COMP   ;ZERO
+Ref     ;BYTE   ;C'GHD'
+        ;JEQ    ;ENDFILL
+        ;JSUB   ;WRREC
+        ;J      ;CLOOP
+ENDFILL ;LDA    ;EOF
+        ;STA    ;BUFFER
+        ;LDA    ;THREE
+        ;STA    ;LENGTH
+        ;JSUB   ;WRREC
+        ;LDL    ;RETADR
+        ;FIX
+RDREC   ;LDX    ;ZERO
+        ;STCH   ;BUFFER,X
+        ;LDA    ;#3
+WRREC   ;LDX    ;ZERO
+        ;RSUB
+        END     ;COPY

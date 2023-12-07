@@ -42,4 +42,4 @@ WLOOP   ;TD     ;OUTPUT
         ;TIX    ;LENGTH
         ;JLT    ;WLOOP
         ;RSUB
-        ;END    ;FIRST                                             
+        ;END    ;FIRST                                         

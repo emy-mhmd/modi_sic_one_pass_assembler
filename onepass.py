@@ -5,7 +5,7 @@ class File:
     def __init__(self):
        self.df=0 
     def read_file(self):
-        self.df = pd.read_csv('Input.csv', delimiter=';',header=None)
+        self.df = pd.read_csv('ASSEMBLY.csv', delimiter=';',header=None)
         self.df = self.df.apply(lambda x: x.str.replace(';', ''))
 
 
@@ -32,6 +32,8 @@ class Onepass:
         self.tRecord_started = True
         self.locationCounter_ForwarReferencing = ""
         self.Reference_ForwarReferencing = ""
+        self.first_instruction = ""
+        self.flag_first_instruction = False
 
     def read_line(self,f):
         self.locationcounter.append(f.df.iloc[0,2])
@@ -180,6 +182,12 @@ class Onepass:
                 for key,value in d.opcode_3.items():
                     if value==row[1].strip() or (value==row[1][1:-1].strip() and self.check_imm(row[1][0])):
                         opcode = key
+
+                if not self.flag_first_instruction:
+                    self.first_instruction = self.pointerLC
+                    self.flag_first_instruction = True
+
+
                 if self.check_indix(str(row[2])[-1]):
                     if isinstance(row[2], str):
                         self.relocation_dic[self.pointerLC] = "1"
@@ -219,7 +227,6 @@ class Onepass:
                                 row[2] = row[2][1:]
 
 
-
                         elif row[2].strip() in self.symboltable:
                             self.relocation_dic[self.pointerLC] = "1"
                             obj=opcode+self.symboltable[row[2].strip()]
@@ -250,6 +257,10 @@ class Onepass:
                 self.counter_bits += 3
                 
             elif self.check_format1(row[1]): 
+                if not self.flag_first_instruction:
+                    self.first_instruction = self.pointerLC
+                    self.flag_first_instruction = True
+
                 self.interrupt_trecord = True
                 self.relocation_dic[self.pointerLC] = "0"
                 self.collect_trecord_locationCounter.append(self.pointerLC)
@@ -320,7 +331,7 @@ class Onepass:
         prog_len=prog_len.zfill(6).upper()
         self.hline=('H'+name+start+prog_len).strip()
         self.hteRecord.insert(0,self.hline)
-        self.endline='E'+self.symboltable["FIRST"].zfill(6).upper()
+        self.endline='E'+self.first_instruction.zfill(6).upper()
         self.hteRecord.append(self.endline)
         print(self.hteRecord)
 
