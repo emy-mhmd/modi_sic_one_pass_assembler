@@ -5,9 +5,8 @@ class File:
     def __init__(self):
        self.df=0 
     def read_file(self):
-        self.df = pd.read_csv('ASSEMBLY.csv', delimiter=';',header=None)
+        self.df = pd.read_csv('Inputs/Input.csv', delimiter=';',header=None)
         self.df = self.df.apply(lambda x: x.str.replace(';', ''))
-
 
 
 class Onepass:
@@ -32,16 +31,14 @@ class Onepass:
         self.tRecord_started = True
         self.locationCounter_ForwarReferencing = ""
         self.Reference_ForwarReferencing = ""
-<<<<<<< HEAD
         self.first_instruction = ""
+        self.save_label_end = ""
         self.flag_first_instruction = False
-=======
         self.assembly_lines=[]
         self.instruction=[]
         self.label=[]
         self.ref=[]
         self.loc=[]
->>>>>>> 5bf8869230d3f47f4d97ca622345a5eb24b4b0ed
 
     def read_line(self,f):
         self.locationcounter.append(f.df.iloc[0,2])
@@ -198,6 +195,7 @@ class Onepass:
 
                 if not self.flag_first_instruction:
                     self.first_instruction = self.pointerLC
+                    self.save_label_end = row[0].strip()
                     self.flag_first_instruction = True
 
 
@@ -289,7 +287,7 @@ class Onepass:
             self.pointerLC = self.pointerLC[2:].upper()
             self.pointerLC = self.pointerLC.zfill(4)
             self.locationcounter.append(self.pointerLC)
-            
+ 
         
         if(self.counter_bits != 0):
             self.relocation = ""
@@ -318,6 +316,9 @@ class Onepass:
                     self.hteRecord.append(list[i])
         
 
+        
+
+
         # print(self.locationcounter)
         # print(self.objectcode)    
         # print(self.symboltable_ForwardReferencing)
@@ -326,13 +327,18 @@ class Onepass:
         # print(self.symboltable)
         # print(self.locationCounter_ForwarReferencing)
         #print(self.hteRecord)
+        #print(self.assembly_lines)
     
         self.hte(f)
         self.assembly()
-        print(self.assembly_lines)
+        self.create_symbol_table()
+        self.create_assembly_table()
+        self.create_hte()
 
         return self.hteRecord
-                     
+
+
+
     def hte(self,f):
         name=str(f.df.iloc[0,0]).strip().upper()
         name=name.ljust(6,'X')
@@ -355,15 +361,18 @@ class Onepass:
         self.loc.insert(0,'')   
         for i in range (len(self.loc[1:])):  
             if i< len(self.instruction):
-                if (self.instruction[i].strip()!='RESB' and self.instruction[i].strip()!='RESW') and (self.loc[i] in self.relocation_dic):
-                   
-                    single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i]
+                if self.instruction[i] == "RSUB":
+                        single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(), ""
+                                ,self.relocation_dic[self.loc[i]]]
+                elif (self.instruction[i].strip()!='RESB' and self.instruction[i].strip()!='RESW') and (self.loc[i] in self.relocation_dic):                    
+                        single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i]
                                 ,self.relocation_dic[self.loc[i]]]
                 else:
-                   single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i]]
+                   single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i], ""]
                                     
             self.assembly_lines.append(single_line)
-        self.assembly_lines.append('END')    
+        self.assembly_lines.append([self.pointerLC, "" , 'END' , self.save_label_end, ""])
+
 
     def check_byte(self, row):
        
@@ -445,3 +454,23 @@ class Onepass:
             tline = "T00"+list_values[i].upper()+"02000"+lc
             list_hte.append(tline)
         return list_hte
+    
+
+    def create_symbol_table(self):
+        with open("Outputs/symbolTable.txt", 'w') as file2:
+            file2.write("SYMBOLTABLE \t REFERENCES\n")
+            for key, value in self.symboltable.items():
+                file2.write(f"{key.ljust(15)}\t {value}\n")
+
+    def create_assembly_table(self):
+        with open("Outputs/assembly_lines.txt", 'w') as file3:
+            file3.write("Location Counter\tLabel\t\tInstruction\t    Reference\t    MaskingBit\n")
+            for i in range(len(self.assembly_lines)):
+                file3.write(f"{str(self.assembly_lines[i][0]):<19}\t{str(self.assembly_lines[i][1]):<10}"
+                            f"\t{str(self.assembly_lines[i][2]):<12}\t{str(self.assembly_lines[i][3]):<12}"
+                            f"\t{str(self.assembly_lines[i][4])}\n")
+                    
+    def create_hte(self):
+        with open("Outputs/hte.txt", 'w') as file4:
+            for i in range(len(self.hteRecord)):
+                file4.write(f"{str(self.hteRecord[i])} \n")

@@ -1,0 +1,12 @@
+SYMBOLTABLE 	 REFERENCES
+EOF            	 1000
+THREE          	 1003
+ZERO           	 1006
+RETADR         	 1009
+LENGTH         	 100C
+BUFFER         	 100F
+FIRST          	 200F
+CLOOP          	 2012
+ENDFILL        	 2024
+RDREC          	 2037
+WRREC          	 2040

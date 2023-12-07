@@ -24,4 +24,4 @@ RDREC   ;LDX     ;ZERO
         ;LDA     ;#3
 WRREC   ;LDX     ;ZERO
         ;RSUB
-        ;END    ;FIRST 
+        ;END    ;FIRST

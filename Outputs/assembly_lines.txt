@@ -1,0 +1,28 @@
+Location Counter	Label		Instruction	    Reference	    MaskingBit
+                   	COPY      	START       	1000        	
+1000               	EOF       	BYTE        	C’EOF’      	0
+1003               	THREE     	WORD        	3           	0
+1006               	ZERO      	WORD        	0           	0
+1009               	RETADR    	RESW        	1           	
+100C               	LENGTH    	RESW        	1           	
+100F               	BUFFER    	RESB        	4096        	
+200F               	FIRST     	STL         	RETADR      	1
+2012               	CLOOP     	JSUB        	RDREC       	1
+2015               	          	LDA         	LENGTH      	1
+2018               	          	COMP        	ZERO        	1
+201B               	          	JEQ         	ENDFILL     	1
+201E               	          	JSUB        	WRREC       	1
+2021               	          	J           	CLOOP       	1
+2024               	ENDFILL   	LDA         	EOF         	1
+2027               	          	STA         	BUFFER      	1
+202A               	          	LDA         	THREE       	1
+202D               	          	STA         	LENGTH      	1
+2030               	          	JSUB        	WRREC       	1
+2033               	          	LDL         	RETADR      	1
+2036               	          	FIX         	nan         	0
+2037               	RDREC     	LDX         	ZERO        	1
+203A               	          	STCH        	BUFFER,X    	1
+203D               	          	LDA         	#3          	0
+2040               	WRREC     	LDX         	ZERO        	1
+2043               	          	RSUB        	            	0
+2046               	          	END         	FIRST       	
