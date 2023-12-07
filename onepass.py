@@ -32,8 +32,16 @@ class Onepass:
         self.tRecord_started = True
         self.locationCounter_ForwarReferencing = ""
         self.Reference_ForwarReferencing = ""
+<<<<<<< HEAD
         self.first_instruction = ""
         self.flag_first_instruction = False
+=======
+        self.assembly_lines=[]
+        self.instruction=[]
+        self.label=[]
+        self.ref=[]
+        self.loc=[]
+>>>>>>> 5bf8869230d3f47f4d97ca622345a5eb24b4b0ed
 
     def read_line(self,f):
         self.locationcounter.append(f.df.iloc[0,2])
@@ -49,8 +57,13 @@ class Onepass:
         obj = ""
         
         
+        self.instruction.append(f.df.iloc[0,1])
+        self.label.append(f.df.iloc[0,0])
+        self.ref.append(f.df.iloc[0,2])
         for index,row in f.df.iloc[1:-1].iterrows():
-
+            self.instruction.append(row[1])
+            self.label.append(row[0])
+            self.ref.append(row[2])
             if row[0].strip() !='':
                 self.symboltable[row[0].strip()]=self.locationcounter[-1]
 
@@ -309,12 +322,14 @@ class Onepass:
         # print(self.objectcode)    
         # print(self.symboltable_ForwardReferencing)
         # print(self.relocation_dic)
-        # print(self.lc_obj)
+        #print(self.lc_obj)
         # print(self.symboltable)
         # print(self.locationCounter_ForwarReferencing)
         #print(self.hteRecord)
-
+    
         self.hte(f)
+        self.assembly()
+        print(self.assembly_lines)
 
         return self.hteRecord
                      
@@ -333,7 +348,22 @@ class Onepass:
         self.hteRecord.insert(0,self.hline)
         self.endline='E'+self.first_instruction.zfill(6).upper()
         self.hteRecord.append(self.endline)
-        print(self.hteRecord)
+       # print(self.hteRecord)
+
+    def assembly (self):
+        self.loc=self.locationcounter.copy()
+        self.loc.insert(0,'')   
+        for i in range (len(self.loc[1:])):  
+            if i< len(self.instruction):
+                if (self.instruction[i].strip()!='RESB' and self.instruction[i].strip()!='RESW') and (self.loc[i] in self.relocation_dic):
+                   
+                    single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i]
+                                ,self.relocation_dic[self.loc[i]]]
+                else:
+                   single_line=[self.loc[i].strip(),self.label[i].strip(),self.instruction[i].strip(),self.ref[i]]
+                                    
+            self.assembly_lines.append(single_line)
+        self.assembly_lines.append('END')    
 
     def check_byte(self, row):
        
