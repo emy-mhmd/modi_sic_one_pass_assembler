@@ -3,7 +3,7 @@ import dic as d
 
 class File:
     def __init__(self):
-       self.df=0 
+       self.df=0
     def read_file(self):
         self.df = pd.read_csv('Inputs/Input.csv', delimiter=';',header=None)
         self.df = self.df.apply(lambda x: x.str.replace(';', ''))
@@ -42,6 +42,7 @@ class Onepass:
 
     def read_line(self,f):
         self.locationcounter.append(f.df.iloc[0,2])
+
         self.pointerLC = hex(int(f.df.iloc[0,2],16))
         self.pointerLC = self.pointerLC[2:].upper()
         self.pointerLC = self.pointerLC.zfill(4)
@@ -54,13 +55,16 @@ class Onepass:
         obj = ""
         
         
-        self.instruction.append(f.df.iloc[0,1])
         self.label.append(f.df.iloc[0,0])
+        self.instruction.append(f.df.iloc[0,1])
         self.ref.append(f.df.iloc[0,2])
+
         for index,row in f.df.iloc[1:-1].iterrows():
             self.instruction.append(row[1])
             self.label.append(row[0])
             self.ref.append(row[2])
+
+
             if row[0].strip() !='':
                 self.symboltable[row[0].strip()]=self.locationcounter[-1]
 
@@ -76,6 +80,7 @@ class Onepass:
                 start_trecord2 = self.locationcounter[index-1]  
 
 
+
             if(not self.tRecord_started or self.counter_bits >= 30 or 
                ( (self.check_resW(row[1]) or self.check_resB(row[1])) and 
                 (f.df.iloc[index-1][1].strip() != "RESW" or f.df.iloc[index-1][1].strip() != "RESB") )):
@@ -83,7 +88,7 @@ class Onepass:
                 for i in range (len(self.collect_trecord_locationCounter)):
                     self.relocation += self.relocation_dic[self.collect_trecord_locationCounter[i]]
                 self.relocation = self.relocation + "0" * (12 - len(self.relocation))
-                self.relocation = hex(int(self.relocation, 2))[2:].zfill(3).upper() 
+                self.relocation = hex(int(self.relocation, 2))[2:].zfill(3).upper()
                 
                 # get TRecord END
                 self.end_trecord = self.pointerLC
@@ -95,11 +100,12 @@ class Onepass:
                     size_trecord = size_trecord.zfill(2)
 
                 # INSERT THE SIZE AND RELOCATION BITS TO THE TRECORD
+
                 if len(tline) >= 7:
                     tline =  tline[:7] + size_trecord + self.relocation + tline[7:]
         
                 if self.res_start == 0:  
-                    self.hteRecord.append(tline)  
+                    self.hteRecord.append(tline) 
                     tline = ""            
                 
                 self.counter_bits = 0
@@ -149,7 +155,7 @@ class Onepass:
                     tline += obj
                     self.pointerLC = hex(int(self.pointerLC, 16) + int(len(row[2][2:-1])))
                     self.counter_bits += int(len(row[2][2:-1]))
-                    if len(row[2][2:-1]) != 3:
+                    if len(row[2][2:-1]) %3 != 0:
                         self.interrupt_trecord = True
 
                 if self.check_byte_x(row[2]):
@@ -159,7 +165,7 @@ class Onepass:
                     tline += row[2][2:-1]
                     self.pointerLC = hex(int(self.pointerLC, 16) + int(len(row[2][2:-1])/2))
                     self.counter_bits += int(len(row[2][2:-1])/2) 
-                    if len(row[2][2:-1])/2 != 3:
+                    if len(row[2][2:-1])/2 %3 != 0:
                         self.interrupt_trecord = True
                
             elif self.check_word(row[1]):
@@ -211,15 +217,15 @@ class Onepass:
                             obj+=value
                             obj=hex(obj)[2:].upper()
 
-                        elif row[2][0:-2].strip() not in self.symboltable_ForwardReferencing.keys():
-                            arr = []
-                            arr.append(hex(int(self.pointerLC, 16) + 1)[2:])
-                            self.symboltable_ForwardReferencing[row[2].strip()] = arr
-                            obj=opcode+'0000'
+                        # elif row[2][0:-2].strip() not in self.symboltable_ForwardReferencing.keys():
+                        #     arr = []
+                        #     arr.append(hex(int(self.pointerLC, 16) + 1)[2:])
+                        #     self.symboltable_ForwardReferencing[row[2].strip()] = arr
+                        #     obj=opcode+'0000'
 
-                        elif row[2][0:-2].strip() in self.symboltable_ForwardReferencing.keys():
-                            self.symboltable_ForwardReferencing[row[2].strip()].append(hex(int(self.pointerLC, 16) + 1)[2:]) 
-                            obj=opcode+'0000'
+                        # elif row[2][0:-2].strip() in self.symboltable_ForwardReferencing.keys():
+                        #     self.symboltable_ForwardReferencing[row[2].strip()].append(hex(int(self.pointerLC, 16) + 1)[2:]) 
+                        #     obj=opcode+'0000'
 
                                     
                 else:
@@ -236,6 +242,10 @@ class Onepass:
                                 self.relocation_dic[self.pointerLC] = "0"
                             else:
                                 row[2] = row[2][1:]
+                                address = hex(int(self.symboltable[row[2]], 16))[2:].zfill(4).upper()
+                                obj=opcode+address
+                                self.relocation_dic[self.pointerLC] = "1"
+
 
 
                         elif row[2].strip() in self.symboltable:
@@ -316,15 +326,12 @@ class Onepass:
                     self.hteRecord.append(list[i])
         
 
-        
-
-
         # print(self.locationcounter)
         # print(self.objectcode)    
-        # print(self.symboltable_ForwardReferencing)
         # print(self.relocation_dic)
         #print(self.lc_obj)
         # print(self.symboltable)
+        # print(self.symboltable_ForwardReferencing)
         # print(self.locationCounter_ForwarReferencing)
         #print(self.hteRecord)
     
@@ -356,7 +363,7 @@ class Onepass:
         self.hteRecord.insert(0,self.hline)
         self.endline='E'+self.first_instruction.zfill(6).upper()
         self.hteRecord.append(self.endline)
-       # print(self.hteRecord)
+       
 
     def assembly (self):
         self.loc=self.locationcounter.copy()

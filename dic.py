@@ -26,13 +26,6 @@ opcode_3={
     "2C":"TIX",
     "DC":"WD",
 }
-opCode_j={
-    "3C":"J",
-    "30":"JEQ",
-    "34":"JGT",
-    "38":"JLT",
-    "48":"JSUB",
-}
 
 opcode_1={
     "C4":"FIX",
